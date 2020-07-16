@@ -1,0 +1,102 @@
+openapi: 3.0.0
+info:
+  title: API for web interface
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /start:
+    get:
+      tags:
+      - server control
+      summary: Starts writer
+      responses:
+        "200":
+          description: returns OK cannot break
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+  /stop:
+    get:
+      tags:
+      - server control
+      summary: Stops writer
+      responses:
+        "200":
+          description: returns OK cannot break
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+  /add:
+    get:
+      tags:
+      - server control
+      summary: Add var to writer
+      parameters:
+      - name: name
+        in: query
+        description: var name
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: begin
+        in: query
+        description: begin value
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: number
+      - name: fv
+        in: query
+        description: frequency of sim and write var
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          default: 1
+      responses:
+        "200":
+          description: returns status with response code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+  /list_var:
+    get:
+      tags:
+      - server control
+      summary: Count and Variables list with theri values
+      responses:
+        "200":
+          description: returns status with response code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfoSchema'
+components:
+  schemas:
+    Status:
+      type: object
+      properties:
+        response:
+          type: string
+    InfoSchema:
+      type: object
+      properties:
+        cnt:
+          type: integer
+        lst:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: number
+            example:
+              a: 12.2
+              b: 11.5
