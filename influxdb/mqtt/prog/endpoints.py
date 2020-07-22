@@ -2,17 +2,11 @@ from aiohttp import web
 import aio_mqtt
 import random
 import asyncio
-import jwt
 from prog.publisher import WriterApi, VariablesClass, Variable
-from prog.users import USERS
 
 
 class MQTT:
     addr = 'localhost'
-
-
-class JWT:
-    secr = 'secret'
 
 
 class AnswerPattern:
@@ -64,29 +58,6 @@ async def del_var(request):
     return web.json_response(AnswerPattern.get_error_answer())
 
 
-async def auth_token(request):
-    hd = request.headers
-    t = hd.get('Authorization', " ").split(" ")
-    if len(t) != 2:
-        return False
-    if t[0] != 'Bearer':
-        return False
-    try:
-        mas = jwt.decode(str(t[1]), JWT.secr, algorithms=['HS256'])
-    except Exception:
-        return False
-    name = mas.get('name', None)
-    rn = mas.get('rn', None)
-    if name is None or rn is None:
-        return False
-    name = str(name)
-    if name not in USERS:
-        return False
-    if int(rn) != USERS[name][1]:
-        return False
-    return True
-
-
 async def add_mosquitto(request):
     authed = await auth_token(request)
     if not authed:
@@ -105,20 +76,6 @@ async def add_mosquitto(request):
 
     asyncio.get_event_loop().create_task(handle())
     return web.json_response(AnswerPattern.get_success_answer())
-
-
-async def auth(request):
-    t = await request.post()
-    name = t.get("username", None)
-    password = t.get("password", None)
-    if name is None or password is None:
-        return web.json_response(AnswerPattern.get_error_answer())
-    if str(name) not in USERS:
-        return web.json_response(AnswerPattern.get_error_answer())
-    if str(password) != USERS[name][0]:
-        return web.json_response(AnswerPattern.get_error_answer())
-    USERS[name][1] = random.randint(0, 1000000)
-    return web.json_response({"token": jwt.encode({"name": name, "rn": str(USERS[name][1])}, JWT.secr).decode()})
 
 
 async def list_var(request):
