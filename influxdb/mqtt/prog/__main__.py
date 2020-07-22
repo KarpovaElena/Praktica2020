@@ -5,7 +5,6 @@ from prog.db import Database, DBRequest
 Database.set_db('influx', 'prr')
 DBRequest.set_mes('msn')
 ep.MQTT.addr = 'mosq'
-ep.JWT.secr = "qweijslfniEfnsnefsdfpsefqaweqweqrfzdf"
 
 app = web.Application()
 
